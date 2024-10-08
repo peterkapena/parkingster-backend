@@ -4,30 +4,13 @@ import schema from "./schema/schema.js";
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServer } from "@apollo/server";
 import cors from "cors";
-import Context from "./models/context.js";
-import { UserModel } from "./models/user.js";
-import jwt from "./utils/jwt.js";
 import { unwrapResolverError } from "@apollo/server/errors";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
-import auditPlugin from "./auditPlugin.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import refreshTokenRouter from "./refreshTokenRouter.js";
-import { authMiddleware } from "./authMiddleware.js";
 
 const app = express();
 app.use(express.json());
-app.use(authMiddleware);
-app.use('/api', refreshTokenRouter);
-
-// Get the directory name
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Define the static folder
-app.use('/public', express.static(path.join(__dirname, 'public')));
 
 const httpServer = http.createServer(app);
 const server = new ApolloServer({
@@ -53,7 +36,6 @@ const server = new ApolloServer({
         process.env.NODE_ENV === "production"
             ? ApolloServerPluginLandingPageDisabled()
             : ApolloServerPluginLandingPageLocalDefault(),
-        auditPlugin
     ],
 });
 
@@ -65,21 +47,7 @@ app.use(
         // origin: process.env.ORIGINS.split(";"),
     }),
     express.json(),
-    expressMiddleware(server, {
-        context: async (ctx: Context) => {
-            const token = ctx.req.headers.authorization || "";
-            if (token) {
-                try {
-                    const {_id} = jwt.decode(token);
-                    // console.log(_id)
-                    ctx.user = await UserModel.findById(_id);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-            return ctx;
-        },
-    }),
+    expressMiddleware(server),
 );
 
 const port = +process.env.GRAPHQL_PORT || 4000;
