@@ -11,9 +11,9 @@ export async function addRandomParkingSpaces() {
 
         // Array of three random geolocations for the Bellville area
         const parkingSpaceGeoLocations = [
-            "-33.8984, 18.6296", // Bellville, Cape Town - Random coordinates
-            "-33.9005, 18.6262",
-            "-33.8968, 18.6334",
+            "-33.9326579894, 18.6441331722", // deece block b
+            "-33.9332572403, 18.6418032646",//shuttle point
+            "-33.9320971834, 18.6440044262",//deece block a
         ];
 
         for (const geoLocation of parkingSpaceGeoLocations) {
