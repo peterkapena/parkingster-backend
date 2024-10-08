@@ -59,7 +59,7 @@ export class BookingService {
               type: "Point",
               coordinates: [lng, lat]
             },
-            $maxDistance: 300 // distance in meters
+            $maxDistance: 500 // distance in meters
           }
         }
       }).exec();
